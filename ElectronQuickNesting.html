@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+<!-- #ElectronQuickNesting · Electron在线网页嵌套方案# -->
+<!-- 使用方法：
+    1.将第10行的"Electron"修改为窗口标题
+    2.将第57行中的网址替换为要实现嵌套的网址 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electron</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgb(0, 170, 255);
+        }
+        
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .main{
+            padding-top: 145px;
+            text-align: center;
+            -webkit-text-fill-color: rgb(31, 31, 31);
+            padding-bottom: 48px;
+        }
+        .footer{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 1px 0;
+            font-style: italic;
+            font-size: 12px;
+            color: #777;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <h1 id="loadingTitle">正在加载，请稍等<span id="dots"></span></h1>
+        <h5>如果长时间未加载成功，请检查网络连接或联系客户端作者解决。</h5>
+    </div>
+    <div class="footer">
+        <p>Powered by ElectronQuickNesting</p>
+    </div>
+    <iframe src="https://example.com" frameborder="0"></iframe>
+    <script>
+        window.addEventListener('resize', function() {
+            var iframe = document.querySelector('iframe');
+            if (iframe) {
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+            }
+        });
+
+        var loadingIntervalId = null;
+        (function animateLoadingDots(){
+            var dotsEl = document.getElementById('dots');
+            if (!dotsEl) return;
+            var count = 0;
+            loadingIntervalId = setInterval(function() {
+                count = (count + 1) % 4;
+                dotsEl.textContent = '.'.repeat(count);
+            }, 500);
+        })();
+
+        (function handleIframeLoad() {
+            var iframe = document.querySelector('iframe');
+            if (!iframe) return;
+            iframe.addEventListener('load', function() {
+                var footer = document.querySelector('.footer');
+                if (footer && footer.parentNode) {
+                    footer.parentNode.removeChild(footer);
+                }
+                var main = document.querySelector('.main');
+                if (main) {
+                    main.style.display = 'none';
+                }
+                if (loadingIntervalId !== null) {
+                    clearInterval(loadingIntervalId);
+                    loadingIntervalId = null;
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
